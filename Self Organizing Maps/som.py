@@ -22,12 +22,18 @@ som.random_weights_init(X)
 som.train_random(data = X, num_iteration = 100)
 
 # Visualizing the results
-from pylab import bone, pcolor, colorbar, plot, show
+dist = []
+for i in range(len(som.distance_map().T) -1, -1, -1):
+    dist.append(som.distance_map().T[i])
+dist = np.reshape(dist,(len(som.distance_map().T),len(som.distance_map().T)))
+
+from pylab import bone, pcolor, colorbar, show #, plot
 bone()
 pcolor(som.distance_map().T)
 colorbar()
-markers = ['o', 's']
-colors = ['r', 'g']
+# markers = ['o', 's']
+# colors = ['r', 'g']
+"""
 for i, x in enumerate(X):
     w = som.winner(x)
     plot(w[0] + 0.5,
@@ -36,10 +42,14 @@ for i, x in enumerate(X):
          markeredgecolor = colors[y[i]],
          markerfacecolor = 'None',
          markersize = 10,
-         markeredgewidth = 2)
+         markeredgewidth = 2
+         )
+"""
 show()
+dist
 
 # Finding the frauds
 mappings = som.win_map(X)
-frauds = np.concatenate((mappings[(8,1)], mappings[(6,8)]), axis = 0)
+#frauds = np.concatenate((mappings[(2,2)], mappings[(6,8)]), axis = 0)
+frauds = mappings[(2,2)]
 frauds = sc.inverse_transform(frauds)
