@@ -11,8 +11,8 @@ import torch.utils.data
 from torch.autograd import Variable
 
 # Importing the dataset
-movies = pd.read_csv('ml-1m/movies.dat', sep = '::', header = None, engine = 'python', encoding = 'latin-1')
-users = pd.read_csv('ml-1m/users.dat', sep = '::', header = None, engine = 'python', encoding = 'latin-1')
+movies  = pd.read_csv('ml-1m/movies.dat' , sep = '::', header = None, engine = 'python', encoding = 'latin-1')
+users   = pd.read_csv('ml-1m/users.dat'  , sep = '::', header = None, engine = 'python', encoding = 'latin-1')
 ratings = pd.read_csv('ml-1m/ratings.dat', sep = '::', header = None, engine = 'python', encoding = 'latin-1')
 
 # Preparing the training set and the test set
@@ -22,7 +22,7 @@ test_set = pd.read_csv('ml-100k/u1.test', delimiter = '\t')
 test_set = np.array(test_set, dtype = 'int')
 
 # Getting the number of users and movies
-nb_users = int(max(max(training_set[:,0]), max(test_set[:,0])))
+nb_users  = int(max(max(training_set[:,0]), max(test_set[:,0])))
 nb_movies = int(max(max(training_set[:,1]), max(test_set[:,1])))
 
 # Converting the data into an array with users in lines and movies in columns
@@ -86,7 +86,7 @@ test_loss = 0
 s = 0.
 for id_user in range(nb_users):
     input = Variable(training_set[id_user]).unsqueeze(0)
-    target = Variable(test_set[id_user])
+    target = Variable(test_set[id_user]).unsqueeze(0)
     if torch.sum(target.data > 0) > 0:
         output = sae(input)
         target.require_grad = False
@@ -96,3 +96,4 @@ for id_user in range(nb_users):
         test_loss += np.sqrt(loss.data[0]*mean_corrector)
         s += 1.
 print('test loss: '+str(test_loss/s))
+

@@ -4,11 +4,11 @@
 import numpy as np
 import pandas as pd
 import torch
-# import torch.nn as nn
+import torch.nn as nn
 import torch.nn.parallel
-# import torch.optim as optim
+import torch.optim as optim
 import torch.utils.data
-# from torch.autograd import Variable
+from torch.autograd import Variable
 
 # Importing the dataset
 movies  = pd.read_csv('ml-1m/movies.dat' , sep = '::', header = None, engine = 'python', encoding = 'latin-1')
@@ -18,29 +18,30 @@ ratings = pd.read_csv('ml-1m/ratings.dat', sep = '::', header = None, engine = '
 # Preparing the training set and the test set
 training_set = pd.read_csv('ml-100k/u1.base', delimiter = '\t')
 training_set = np.array(training_set, dtype = 'int')
-test_set = pd.read_csv('ml-100k/u1.test', delimiter = '\t')
-test_set = np.array(test_set, dtype = 'int')
+test_set     = pd.read_csv('ml-100k/u1.test', delimiter = '\t')
+test_set     = np.array(test_set, dtype = 'int')
 
 # Getting the number of users and movies
-nb_users = int(max(max(training_set[:,0]), max(test_set[:,0])))
+nb_users  = int(max(max(training_set[:,0]), max(test_set[:,0])))
 nb_movies = int(max(max(training_set[:,1]), max(test_set[:,1])))
 
 # Converting the data into an array with users in lines and movies in columns
 def convert(data):
     new_data = []
     for id_users in range(1, nb_users + 1):
-        id_movies = data[:,1][data[:,0] == id_users]
-        id_ratings = data[:,2][data[:,0] == id_users]
-        ratings = np.zeros(nb_movies)
+        id_movies              = data[:,1][data[:,0] == id_users]
+        id_ratings             = data[:,2][data[:,0] == id_users]
+        ratings                = np.zeros(nb_movies)
         ratings[id_movies - 1] = id_ratings
         new_data.append(list(ratings))
     return new_data
+
 training_set = convert(training_set)
-test_set = convert(test_set)
+test_set     = convert(test_set)
 
 # Converting the data into Torch tensors
 training_set = torch.FloatTensor(training_set)
-test_set = torch.FloatTensor(test_set)
+test_set     = torch.FloatTensor(test_set)
 
 # Converting the ratings into binary ratings 1 (Liked) or 0 (Not Liked)
 training_set[training_set == 0] = -1
@@ -69,7 +70,7 @@ class RBM():
         p_v_given_h = torch.sigmoid(activation)
         return p_v_given_h, torch.bernoulli(p_v_given_h)
     def train(self, v0, vk, ph0, phk):
-        self.W += torch.mm(v0.t(), ph0) - torch.mm(vk.t(), phk)
+        self.W += (torch.mm(v0.t(), ph0) - torch.mm(vk.t(), phk)).t()
         self.b += torch.sum((v0 - vk), 0)
         self.a += torch.sum((ph0 - phk), 0)
 nv = len(training_set[0])
